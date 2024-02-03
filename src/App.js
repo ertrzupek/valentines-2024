@@ -15,14 +15,16 @@ const removeFavicon = () => {
 const setFavicon = () => {
 	var old = getFavicon().href;
 	removeFavicon();
-	var num = parseInt(old.split('.')[0].substring(old.split('.')[0].length -1)) + 1;
+	var numIdx = old.indexOf("frame") + 5;
+	var num = parseInt(old[numIdx]) + 1;
 	if(num === 6) num = 0;
+	console.log(num);
 	var link=document.createElement('link');
 	link.type='image/x-icon';
 	link.rel='icon';
-	link.href=old.split('.')[0].substring(0, old.split('.')[0].length-1) + num + "." + old.split('.')[1];
+	link.href=old.substring(0, numIdx) + num + ".ico";
 	document.getElementsByTagName('head')[0].appendChild(link);
-	//console.log("Set FavIcon URL to " + getFavicon().href);
+	console.log("Set FavIcon URL to " + getFavicon().href);
 }
 
 const getFavicon = () => {
@@ -37,7 +39,7 @@ const getFavicon = () => {
 
 const Animator = () => {
   	useEffect(() => {
-		const timeoutId = setInterval(() => {setFavicon();}, 250);
+		const timeoutId = setInterval(() => {setFavicon();}, 1000);
     	return () => clearInterval(timeoutId);
   }, []);
   return;
