@@ -24,7 +24,7 @@ const setFavicon = () => {
 	link.rel='icon';
 	link.href=old.substring(0, numIdx) + num + ".ico";
 	document.getElementsByTagName('head')[0].appendChild(link);
-	console.log("Set FavIcon URL to " + getFavicon().href);
+	//console.log("Set FavIcon URL to " + getFavicon().href);
 }
 
 const getFavicon = () => {
@@ -39,7 +39,7 @@ const getFavicon = () => {
 
 const Animator = () => {
   	useEffect(() => {
-		const timeoutId = setInterval(() => {setFavicon();}, 250);
+		const timeoutId = setInterval(() => {setFavicon();}, 500);
     	return () => clearInterval(timeoutId);
   }, []);
   return;
