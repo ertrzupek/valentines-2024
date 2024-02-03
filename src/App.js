@@ -39,7 +39,7 @@ const getFavicon = () => {
 
 const Animator = () => {
   	useEffect(() => {
-		const timeoutId = setInterval(() => {setFavicon();}, 250);
+		const timeoutId = setInterval(() => {setFavicon();}, 500);
     	return () => clearInterval(timeoutId);
   }, []);
   return;
