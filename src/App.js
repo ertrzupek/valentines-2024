@@ -64,8 +64,8 @@ const ouch = () => {
 
 const App = () => {
 	const [state, setState] = React.useState([0,-1]);
-	const dateStart = ['10 February 2024 8:30 PST', '17 February 2024 8:30 PST', '18 February 2024 8:30 PST'];
-	const dateEnd = ['10 February 2024 14:30 PST', '17 February 2024 14:30 PST', '18 February 2024 14:30 PST'];
+	const dateStart = ['10 February 2024 11:30 PST', '17 February 2024 11:30 PST', '18 February 2024 11:30 PST'];
+	const dateEnd = ['10 February 2024 17:30 PST', '17 February 2024 17:30 PST', '18 February 2024 17:30 PST'];
 	const signIn = () => {
 		apiCalendar
 			.handleAuthClick()
@@ -90,11 +90,11 @@ const App = () => {
 				timeZone: "America/Los_Angeles"
 			},
 		};
-		  
 		apiCalendar
 			.createEvent(event)
 			.then((result) => {
 			  console.log(result);
+			  window.location.href = "https://calendar.google.com/calendar/u/0/r/week/2024/2/" + ((state[1] + 1) * 7) + "?tab=rc";
 			})
 			.catch((error) => {
 			  console.log(error);
