@@ -1,6 +1,7 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import ApiCalendar from "react-google-calendar-api";
+import Countdown, {zeroPad} from 'react-countdown';
 const config = {
 	clientId: process.env.REACT_APP_CLIENT_ID,
 	apiKey: process.env.REACT_APP_API_KEY,
@@ -28,7 +29,6 @@ const setFavicon = () => {
 	var numIdx = old.indexOf("frame") + 5;
 	var num = parseInt(old[numIdx]) + 1;
 	if(num === 6) num = 0;
-	console.log(num);
 	var link=document.createElement('link');
 	link.type='image/x-icon';
 	link.rel='icon';
@@ -63,9 +63,32 @@ const ouch = () => {
 }
 
 const App = () => {
+	const [data, setData] = React.useState([]);
 	const [state, setState] = React.useState([0,-1]);
 	const dateStart = ['10 February 2024 11:30 PST', '17 February 2024 11:30 PST', '18 February 2024 11:30 PST'];
 	const dateEnd = ['10 February 2024 17:30 PST', '17 February 2024 17:30 PST', '18 February 2024 17:30 PST'];
+	const date = []
+	const pageState = (event) => {
+		const newPage = parseInt(event.target.getAttribute("newpage"));
+		const newDate = (event.target.getAttribute("date")) ? parseInt(event.target.getAttribute("date")) : state[1];
+		setState([newPage, newDate]);
+	}
+    React.useEffect(() => {
+        fetch("https://broken-iodized-reaction.glitch.me/data")
+        .then(res => res.json())
+        .then(json => setData(json.dat));
+    }, []);
+    const changeValue = (event) => {
+		const d = (event != null) ? -1 : state[1];
+        fetch("https://broken-iodized-reaction.glitch.me/data", {
+            method: "post",
+            headers: {
+				"d": d
+            }
+        })
+            .then(res => res.json())
+            .then(json => setData(json.dat))
+    }
 	const signIn = () => {
 		apiCalendar
 			.handleAuthClick()
@@ -100,78 +123,92 @@ const App = () => {
 			  console.log(error);
 			});
 	}
-	const pageState = (event) => {
-		console.log("here, to page " + event.target.getAttribute("newpage"));
-		const newPage = parseInt(event.target.getAttribute("newpage"));
-		const newDate = (event.target.getAttribute("date")) ? parseInt(event.target.getAttribute("date")) : state[1];
-		setState([newPage, newDate]);
-	}
-	if (state[0] === 5) {
+	const renderer = ({days, hours, minutes, seconds, completed}) => {
+  		if(completed) {
+    		return <div>♡♡♡</div>;
+ 		 } else {
+   			return <div>{days}:{zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}</div>
+		}
+	};
+	const showcal = data.fdate == data.date ? "" : "none";
+	if(parseInt(data.date) > -1 && state[0] === 0) {
 		return (
 			<div>
 				<Animator/>
 				<div id="container">
-					damn :0 maybe another time :pensive:
-				</div>
-			</div>
-		);
-	} else if(state[0] === 4) {
-		return (
-			<div>
-				<Animator/>
-				<div id="container">
-					bruh... <br/>
-					the 18th?
-					<button onClick={pageState} newpage="2" date="2">yes</button>
-					<button onClick={pageState} newpage="5">no :(</button>
-				</div>
-			</div>
-		);
-	} else if(state[0] === 3) {
-		return (
-			<div>
-				<Animator/>
-				<div id="container">
-					hmm... ok <br/>
-					what about 2/17? still 11:30 to 5:30?
-					<button onClick={pageState} newpage="2" date="1">yes</button>
-					<button onClick={pageState} newpage="4">no :(</button>
-				</div>
-			</div>
-		);
-	} else if(state[0] === 2) {
-		return (
-			<div>
-				<Animator/>
-				<div id="container">
-					its a date :D ({dateStart[state[1]]}) <br/>
-					<button onClick={signIn}>add to google calendar?</button>
-					
-				</div>
-			</div>
-		);
-	} else if(state[0] === 1) {
-		return (
-			<div>
-				<Animator/>
-				<div id="container">
-					are you free 2/10, 11:30 to 5:30 (ish)?
-					<button onClick={pageState} newpage="2" date="0">yes</button>
-					<button onClick={pageState} newpage="3">no :(</button>
+					<Countdown date={new Date(dateStart[data.fdate]).toISOString()} renderer={renderer}/>
+					<button onClick={changeValue}>reset web app?</button>
 				</div>
 			</div>
 		);
 	} else {
-		return (
-			<div>
-				<Animator/>
-				<div id="container">
-					will you be my valentine?
-					<button onClick={pageState} newpage="1">yes</button>
-					<button id="no" onMouseEnter={moveButton} onClick={ouch}>no :(</button>
+		if(data.date === -1 && data.date !== state[1]) {changeValue()}
+		if (state[0] === 5) {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						damn :0 maybe another time :pensive:
+					</div>
 				</div>
-			</div>
-		);
+			);
+		} else if(state[0] === 4) {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						bruh... <br/>
+						the 18th?
+						<button onClick={pageState} newpage="2" date="2">yes</button>
+						<button onClick={pageState} newpage="5">no :(</button>
+					</div>
+				</div>
+			);
+		} else if(state[0] === 3) {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						hmm... ok <br/>
+						what about 2/17? still 11:30 to 5:30?
+						<button onClick={pageState} newpage="2" date="1">yes</button>
+						<button onClick={pageState} newpage="4">no :(</button>
+					</div>
+				</div>
+			);
+		} else if(state[0] === 2) {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						its a date :D ({dateStart[state[1]]}) <br/>
+						<button onClick={signIn} style={{display:showcal}}>add to google calendar?</button>
+					</div>
+				</div>
+			);
+		} else if(state[0] === 1) {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						are you free 2/10, 11:30 to 5:30 (ish)?
+						<button onClick={pageState} newpage="2" date="0">yes</button>
+						<button onClick={pageState} newpage="3">no :(</button>
+					</div>
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					<Animator/>
+					<div id="container">
+						will you be my valentine?
+						<button onClick={pageState} newpage="1">yes</button>
+						<button id="no" onMouseEnter={moveButton} onClick={ouch}>no :(</button>
+					</div>
+				</div>
+			);
+		}
 	}
 }
 
