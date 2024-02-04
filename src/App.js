@@ -71,8 +71,8 @@ const App = () => {
 		gapi.load('client:auth2', () => {
 			console.log('loaded client')
 			gapi.client.init({
-				apiKey: process.env.API_KEY,
-				clientId: process.env.CLIENT_ID,
+				apiKey: process.env.REACT_APP_API_KEY,
+				clientId: process.env.REACT_APP_CLIENT_ID,
 				discoveryDocs: DISCOVERY_DOCS,
 				scope: SCOPES,
 			})
