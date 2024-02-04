@@ -1,5 +1,16 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
+import ApiCalendar from "react-google-calendar-api";
+const config = {
+	clientId: process.env.REACT_APP_CLIENT_ID,
+	apiKey: process.env.REACT_APP_API_KEY,
+	scope: "https://www.googleapis.com/auth/calendar",
+	discoveryDocs: [
+	  	"https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+	],
+};
+  
+const apiCalendar = new ApiCalendar(config);
 
 //favicon functs from https://www.enhanceie.com/test/favicon/dynamic.htm
 const removeFavicon = () => {
@@ -11,7 +22,6 @@ const removeFavicon = () => {
 		}         
 	}      
 }
-
 const setFavicon = () => {
 	var old = getFavicon().href;
 	removeFavicon();
@@ -26,7 +36,6 @@ const setFavicon = () => {
 	document.getElementsByTagName('head')[0].appendChild(link);
 	//console.log("Set FavIcon URL to " + getFavicon().href);
 }
-
 const getFavicon = () => {
 	var links=document.getElementsByTagName('link');
 	for(var i=0; i<links.length; i++) {
@@ -36,7 +45,6 @@ const getFavicon = () => {
 	}
 	return undefined;
 }
-
 const Animator = () => {
   	useEffect(() => {
 		const timeoutId = setInterval(() => {setFavicon();}, 500);
@@ -50,63 +58,48 @@ const moveButton = (event) => {
 	event.target.style.left = left+"px";
 	event.target.style.top = top+"px";
 }
-
 const ouch = () => {
 	console.log("rude >:(");
 }
 
 const App = () => {
 	const [state, setState] = React.useState([0,-1]);
-	const dateStart = ['10 February 2024 11:30 PST', '17 February 2024 11:30 PST', '18 February 2024 11:30 PST'];
-	const dateEnd = ['10 February 2024 17:30 PST', '17 February 2024 17:30 PST', '18 February 2024 17:30 PST'];
-	var eventStart = (state[1] > -1) ? new Date(dateStart[state[1]]) : null;
-	var eventEnd = (state[1] > -1) ? new Date(dateEnd[state[1]]) : null;
-
-	var gapi = window.gapi;
-	console.log(process.env.REACT_APP_CLIENT_ID)
-	console.log(process.env.REACT_APP_API_KEY)
-	var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
-  	var SCOPES = "https://www.googleapis.com/auth/calendar.events";
-	const addEvent = () => {
-		gapi.load('client:auth2', () => {
-			console.log('loaded client')
-			gapi.client.init({
-				apiKey: process.env.REACT_APP_API_KEY,
-				clientId: process.env.REACT_APP_CLIENT_ID,
-				discoveryDocs: DISCOVERY_DOCS,
-				scope: SCOPES,
-			})
-			gapi.client.load('calendar', 'v3', () => console.log('bam!'))
-			gapi.auth2.getAuthInstance().signIn()
+	const dateStart = ['10 February 2024 8:30 PST', '17 February 2024 8:30 PST', '18 February 2024 8:30 PST'];
+	const dateEnd = ['10 February 2024 14:30 PST', '17 February 2024 14:30 PST', '18 February 2024 14:30 PST'];
+	const signIn = () => {
+		apiCalendar
+			.handleAuthClick()
 			.then(() => {
-			  	var event = {
-					'summary': 'pre-valentines date :)',
-					'location': '5110 San Fernando Rd, Glendale, CA 91204',
-					'description': 'U+1F6FC',
-					'start': {
-						'dateTime': {eventStart},
-						'timeZone': 'America/Los_Angeles'
-					},
-					'end': {
-						'dateTime': {eventEnd},
-						'timeZone': 'America/Los_Angeles'
-					},
-					'attendees': [
-						{'email': 'ertrzupek@gmail.com'}
-					]
-			  	}
-				var request = gapi.client.calendar.events.insert({
-					'calendarId': 'primary',
-					'resource': event,
-				})
-				request.execute(event => {
-					console.log(event)
-					window.open(event.htmlLink)
-				})	  
+				addEvent();
 			})
-		})
+			.catch((error) => {
+				console.log(error);
+			});
 	}
-
+	const addEvent = () => {
+		const event = {
+			summary: "pre-valentines date :)",
+			location: "5110 San Fernando Rd, Glendale, CA 91204",
+			description: "U+1F6FC",
+			start: {
+				dateTime: new Date(dateStart[state[1]]).toISOString(),
+				timeZone: "America/Los_Angeles"
+			},
+			end: {
+				dateTime: new Date(dateEnd[state[1]]).toISOString(),
+				timeZone: "America/Los_Angeles"
+			},
+		};
+		  
+		apiCalendar
+			.createEvent(event)
+			.then((result) => {
+			  console.log(result);
+			})
+			.catch((error) => {
+			  console.log(error);
+			});
+	}
 	const pageState = (event) => {
 		console.log("here, to page " + event.target.getAttribute("newpage"));
 		const newPage = parseInt(event.target.getAttribute("newpage"));
@@ -152,7 +145,7 @@ const App = () => {
 				<Animator/>
 				<div id="container">
 					its a date :D ({dateStart[state[1]]}) <br/>
-					<button onClick={addEvent}>add to google calendar :)</button>
+					<button onClick={signIn}>add to google calendar?</button>
 					
 				</div>
 			</div>
