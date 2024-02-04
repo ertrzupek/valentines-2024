@@ -63,18 +63,16 @@ const App = () => {
 	var eventEnd = (state[1] > -1) ? new Date(dateEnd[state[1]]) : null;
 
 	var gapi = window.gapi;
-	const CLIENT = process.env.CLIENT_ID;
-	const API = process.env.API_KEY;
-	console.log(API)
-	console.log(CLIENT)
+	console.log(process.env.REACT_APP_CLIENT_ID)
+	console.log(process.env.REACT_APP_API_KEY)
 	var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
   	var SCOPES = "https://www.googleapis.com/auth/calendar.events";
 	const addEvent = () => {
 		gapi.load('client:auth2', () => {
 			console.log('loaded client')
 			gapi.client.init({
-				apiKey: API,
-				clientId: CLIENT,
+				apiKey: process.env.API_KEY,
+				clientId: process.env.CLIENT_ID,
 				discoveryDocs: DISCOVERY_DOCS,
 				scope: SCOPES,
 			})
