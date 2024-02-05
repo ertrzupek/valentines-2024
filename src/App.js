@@ -47,7 +47,7 @@ const getFavicon = () => {
 }
 const Animator = () => {
   	useEffect(() => {
-		const timeoutId = setInterval(() => {setFavicon();}, 500);
+		const timeoutId = setInterval(() => {setFavicon();}, 400);
     	return () => clearInterval(timeoutId);
   }, []);
    return;
@@ -57,6 +57,8 @@ const moveButton = (event) => {
 	const top = Math.floor(Math.random() * (window.innerHeight - 50));
 	event.target.style.left = left+"px";
 	event.target.style.top = top+"px";
+	event.target.style.position = "absolute";
+	document.getElementById("ghost").style.display = "initial";
 }
 const ouch = () => {
 	console.log("rude >:(");
@@ -67,7 +69,7 @@ const App = () => {
 	const [state, setState] = React.useState([0,-1]);
 	const dateStart = ['10 February 2024 11:30 PST', '17 February 2024 11:30 PST', '18 February 2024 11:30 PST'];
 	const dateEnd = ['10 February 2024 17:30 PST', '17 February 2024 17:30 PST', '18 February 2024 17:30 PST'];
-	const date = []
+	const dates = ["02/10/2024", "02/17/2024", "02/18/2024"];
 	const pageState = (event) => {
 		const newPage = parseInt(event.target.getAttribute("newpage"));
 		const newDate = (event.target.getAttribute("date")) ? parseInt(event.target.getAttribute("date")) : state[1];
@@ -125,9 +127,9 @@ const App = () => {
 	}
 	const renderer = ({days, hours, minutes, seconds, completed}) => {
   		if(completed) {
-    		return <div>♡♡♡</div>;
+    		return <div id="countdown">♡♡♡</div>;
  		 } else {
-   			return <div>{days}:{zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}</div>
+   			return <div><div id="countdown">{days}:{zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}</div><br/>til {dates[data.date]}</div>
 		}
 	};
 	const showcal = data.fdate == data.date ? "" : "none";
@@ -135,9 +137,9 @@ const App = () => {
 		return (
 			<div>
 				<Animator/>
-				<div id="container">
+				<button id="reset" onClick={changeValue}>reset web app?</button>
+				<div id="center">
 					<Countdown date={new Date(dateStart[data.fdate]).toISOString()} renderer={renderer}/>
-					<button onClick={changeValue}>reset web app?</button>
 				</div>
 			</div>
 		);
@@ -147,8 +149,8 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
-						damn :0 maybe another time :pensive:
+					<div id="center">
+					damn :O maybe another time <img src={require(`./pensive.png`)} width="15px" height="15px" alt = ":("/>
 					</div>
 				</div>
 			);
@@ -156,9 +158,9 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
+					<div id="center">
 						bruh... <br/>
-						the 18th?
+						the 18th?<br/><br/>
 						<button onClick={pageState} newpage="2" date="2">yes</button>
 						<button onClick={pageState} newpage="5">no :(</button>
 					</div>
@@ -168,9 +170,9 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
+					<div id="center">
 						hmm... ok <br/>
-						what about 2/17? still 11:30 to 5:30?
+						what about 2/17? still 11:30 to 5:30 ofc<br/><br/>
 						<button onClick={pageState} newpage="2" date="1">yes</button>
 						<button onClick={pageState} newpage="4">no :(</button>
 					</div>
@@ -180,8 +182,8 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
-						its a date :D ({dateStart[state[1]]}) <br/>
+					<div id="center">
+						yayyy its a date :D<br/><br/>
 						<button onClick={signIn} style={{display:showcal}}>add to google calendar?</button>
 					</div>
 				</div>
@@ -190,8 +192,8 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
-						are you free 2/10, 11:30 to 5:30 (ish)?
+					<div id="center">
+						are you free 2/10, 11:30 to 5:30 (ish)?<br/><br/>
 						<button onClick={pageState} newpage="2" date="0">yes</button>
 						<button onClick={pageState} newpage="3">no :(</button>
 					</div>
@@ -201,9 +203,10 @@ const App = () => {
 			return (
 				<div>
 					<Animator/>
-					<div id="container">
-						will you be my valentine?
+					<div id="center">
+						will you be my valentine?<br/><br/>
 						<button onClick={pageState} newpage="1">yes</button>
+						<button id="ghost">no :(</button>
 						<button id="no" onMouseEnter={moveButton} onClick={ouch}>no :(</button>
 					</div>
 				</div>
