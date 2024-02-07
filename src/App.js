@@ -104,7 +104,6 @@ const App = () => {
 	const addEvent = () => {
 		const event = {
 			summary: "pre-valentines date :)",
-			location: "5110 San Fernando Rd, Glendale, CA 91204",
 			description: "U+1F6FC",
 			start: {
 				dateTime: new Date(dateStart[state[1]]).toISOString(),
